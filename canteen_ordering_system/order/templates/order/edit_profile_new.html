@@ -1,0 +1,95 @@
+{% extends 'base/base.html' %}
+{% block title %}Editar Perfil{% endblock title %}
+{% block maincontent %}
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card p-4">
+        <div class="d-flex align-items-center gap-4 mb-3">
+          <div>
+            {% if profile.profile_pic %}
+              <img id="avatarPreview" src="{{ profile.profile_pic.url }}" alt="avatar" class="rounded-circle" style="width:120px;height:120px;object-fit:cover;border:6px solid rgba(0,0,0,0.04);">
+            {% else %}
+              <div id="avatarPreview" class="rounded-circle d-flex align-items-center justify-content-center bg-light" style="width:120px;height:120px;border:6px solid rgba(0,0,0,0.04);">
+                <i class="fa-solid fa-user text-secondary fa-2x"></i>
+              </div>
+            {% endif %}
+          </div>
+          <div class="flex-grow-1">
+            <h4 class="mb-1">{{ request.user.get_full_name|default:request.user.username }}</h4>
+            <p class="text-muted mb-0">Atualize seus dados de contato e foto de perfil.</p>
+          </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="row g-3">
+          {% csrf_token %}
+
+          <div class="col-md-6">
+            <label class="form-label">Foto de perfil</label>
+            {{ form.profile_pic }}
+            <div class="form-text">Tamanho máximo recomendado: 2MB. Formatos: JPG, PNG.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Telefone</label>
+            {{ form.phone_number }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">CPF</label>
+            {{ form.cpf }}
+            {% if form.cpf.help_text %}
+              <div class="form-text">{{ form.cpf.help_text|safe }}</div>
+            {% endif %}
+            {% if form.cpf.errors %}
+              <div class="text-danger small mt-1">{{ form.cpf.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Endereço</label>
+            {{ form.address }}
+          </div>
+
+          <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+            <a href="{% url 'profile' %}" class="btn btn-outline-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Salvar alterações</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // preview para input file
+  (function(){
+    const fileInput = document.querySelector('input[name="profile_pic"]');
+    const preview = document.getElementById('avatarPreview');
+    if(fileInput){
+      fileInput.addEventListener('change', function(e){
+        const f = e.target.files && e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = function(ev){
+          if(preview.tagName === 'IMG'){
+            preview.src = ev.target.result;
+          } else {
+            // substituir div por imagem
+            const img = document.createElement('img');
+            img.id = 'avatarPreview';
+            img.src = ev.target.result;
+            img.alt = 'avatar';
+            img.className = 'rounded-circle';
+            img.style = 'width:120px;height:120px;object-fit:cover;border:6px solid rgba(0,0,0,0.04);';
+            preview.replaceWith(img);
+          }
+        };
+        reader.readAsDataURL(f);
+      });
+    }
+  })();
+</script>
+
+{% endblock maincontent %}

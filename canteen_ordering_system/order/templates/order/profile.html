@@ -1,0 +1,569 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block maincontent %}
+<div class="profile-wrapper">
+    <div class="container py-5">
+        <!-- Header do Perfil -->
+        <div class="profile-header-card mb-4">
+            <div class="profile-cover-image"></div>
+            <div class="profile-header-content">
+                <div class="row align-items-end">
+                    <div class="col-md-8 d-flex align-items-center gap-4">
+                        <div class="profile-avatar-wrapper">
+                            {% if request.user.profile.profile_pic %}
+                                <img src="{{ request.user.profile.profile_pic.url }}" alt="Foto de perfil" class="profile-avatar">
+                            {% else %}
+                                <div class="profile-avatar-placeholder">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="profile-info">
+                            <h1 class="profile-name">{{ request.user.get_full_name|default:request.user.username|title }}</h1>
+                            <p class="profile-email mb-2">{{ request.user.email }}</p>
+                            <p class="profile-member-since mb-0">
+                                <i class="fa-solid fa-calendar-days me-2"></i>
+                                Membro desde {{ request.user.date_joined|date:"F \d\e Y" }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="profile-actions d-flex gap-2 justify-content-md-end mt-4 mt-md-0">
+                            <a href="{% url 'profile-edit' %}" class="btn btn-light btn-lg">
+                                <i class="fa-solid fa-user-pen me-2"></i>Editar Perfil
+                            </a>
+                            <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fa-solid fa-right-from-bracket me-2"></i>Sair
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="row g-4">
+            <!-- Coluna da Esquerda - Informações do Perfil -->
+            <div class="col-lg-4">
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fa-solid fa-circle-info me-2"></i>Informações Pessoais</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">Nome de Usuário</span>
+                            <span class="info-value">{{ request.user.username }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">{{ request.user.email|default:"Não informado" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Telefone</span>
+                            <span class="info-value">{{ request.user.profile.phone_number|default:"Não informado" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Endereço</span>
+                            <span class="info-value">{{ request.user.profile.address|default:"Não informado" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fa-solid fa-chart-simple me-2"></i>Estatísticas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fa-solid fa-box"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <span class="stat-value">{{ orders|length }}</span>
+                                        <span class="stat-label">Pedidos</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fa-solid fa-money-bill-wave"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <span class="stat-value">R$ {{ total_spent|default:"0" }}</span>
+                                        <span class="stat-label">Total Gasto</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna da Direita - Últimos Pedidos -->
+            <div class="col-lg-8">
+                <div class="profile-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>Últimos Pedidos</h5>
+                        <a href="{% url 'my-orders' %}" class="btn btn-primary btn-sm">
+                            Ver Todos<i class="fa-solid fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if orders %}
+                            <div class="table-responsive">
+                                <table class="table orders-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Pedido</th>
+                                            <th>Data</th>
+                                            <th>Status</th>
+                                            <th>Total</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders|slice:":5" %}
+                                            <tr>
+                                                <td>#{{ order.id }}</td>
+                                                <td>{{ order.order_datetime|date:"d/m/Y H:i" }}</td>
+                                                <td>
+                                                    <span class="status-badge status-{{ order.status|lower }}">
+                                                        {{ order.status }}
+                                                    </span>
+                                                </td>
+                                                <td>R$ {{ order.total_amount }},00</td>
+                                                <td>
+                                                    <a href="#" class="btn btn-sm btn-light" title="Ver detalhes">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fa-solid fa-box-open fa-3x text-muted mb-3"></i>
+                                <h6 class="text-muted">Você ainda não fez nenhum pedido</h6>
+                                <a href="{% url 'menu' %}" class="btn btn-primary mt-3">
+                                    <i class="fa-solid fa-utensils me-2"></i>Ver Cardápio
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos Gerais */
+.profile-wrapper {
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 56px);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Header do Perfil */
+.profile-header-card {
+    background: #fff;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+    animation: slideInFromTop 0.6s ease-out;
+}
+
+.profile-cover-image {
+    height: 200px;
+    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.profile-header-content {
+    padding: 2rem;
+    margin-top: -100px;
+    animation: slideUp 0.6s ease-out 0.2s both;
+}
+
+.profile-avatar-wrapper {
+    position: relative;
+    animation: scaleIn 0.6s ease-out 0.3s both;
+}
+
+.profile-avatar, .profile-avatar-placeholder {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.profile-avatar:hover, .profile-avatar-placeholder:hover {
+    transform: scale(1.05) rotateZ(-5deg);
+    box-shadow: 0 0.8rem 1.5rem rgba(13, 110, 253, 0.2);
+}
+
+.profile-avatar-placeholder {
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-avatar-placeholder i {
+    font-size: 4rem;
+    color: #adb5bd;
+    animation: float 3s ease-in-out infinite;
+}
+
+.profile-name {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #212529;
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.profile-email {
+    color: #6c757d;
+    font-size: 1rem;
+    animation: fadeInUp 0.6s ease-out 0.5s both;
+}
+
+.profile-member-since {
+    color: #6c757d;
+    font-size: 0.875rem;
+    animation: fadeInUp 0.6s ease-out 0.6s both;
+}
+
+/* Cards */
+.profile-card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    animation: slideUp 0.6s ease-out backwards;
+    transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 1rem 2rem rgba(13, 110, 253, 0.15);
+}
+
+.profile-card:nth-child(1) { animation-delay: 0.3s; }
+.profile-card:nth-child(2) { animation-delay: 0.4s; }
+
+.profile-card .card-header {
+    background: #fff;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem;
+    animation: fadeInDown 0.6s ease-out;
+}
+
+.profile-card .card-header h5 {
+    color: #212529;
+    font-weight: 600;
+    margin: 0;
+}
+
+.profile-card .card-body {
+    padding: 1.5rem;
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+/* Informações do Perfil */
+.info-item {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    animation: fadeInUp 0.5s ease-out backwards;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    padding-left: 10px;
+    border-bottom-color: #0d6efd;
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.info-label {
+    display: block;
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.info-value {
+    color: #212529;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.info-item:nth-child(1) { animation-delay: 0.1s; }
+.info-item:nth-child(2) { animation-delay: 0.2s; }
+.info-item:nth-child(3) { animation-delay: 0.3s; }
+.info-item:nth-child(4) { animation-delay: 0.4s; }
+
+/* Cards de Estatísticas */
+.stat-card {
+    background: #f8f9fa;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: slideUp 0.6s ease-out backwards;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    background: #e9ecef;
+    transform: translateY(-5px);
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.2s; }
+.stat-card:nth-child(2) { animation-delay: 0.3s; }
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0d6efd;
+    animation: rotateIcon 3s linear infinite;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+    animation: none;
+    transform: scale(1.2);
+    background: #0d6efd;
+    color: #fff;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.stat-label {
+    display: block;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+/* Tabela de Pedidos */
+.orders-table {
+    margin: 0;
+}
+
+.orders-table th {
+    background: #f8f9fa;
+    font-weight: 500;
+    color: #495057;
+    padding: 1rem 1.5rem;
+    animation: fadeInDown 0.6s ease-out;
+}
+
+.orders-table td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    animation: fadeInUp 0.5s ease-out backwards;
+}
+
+.orders-table tbody tr:nth-child(1) td { animation-delay: 0.1s; }
+.orders-table tbody tr:nth-child(2) td { animation-delay: 0.2s; }
+.orders-table tbody tr:nth-child(3) td { animation-delay: 0.3s; }
+.orders-table tbody tr:nth-child(4) td { animation-delay: 0.4s; }
+.orders-table tbody tr:nth-child(5) td { animation-delay: 0.5s; }
+
+.orders-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.orders-table tbody tr:hover {
+    background: rgba(13, 110, 253, 0.03);
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    animation: scaleIn 0.4s ease-out;
+    transition: all 0.3s ease;
+}
+
+.status-badge:hover {
+    transform: scale(1.1);
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-accepted {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.status-cooking {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-packed {
+    background: #e2e3ff;
+    color: #2d31fa;
+}
+
+.status-completed {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+/* Botões */
+.btn {
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.btn:nth-of-type(1) { animation-delay: 0.5s; }
+.btn:nth-of-type(2) { animation-delay: 0.6s; }
+
+.btn-lg {
+    padding: 0.75rem 1.25rem;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(13, 110, 253, 0.3);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: left 0.4s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-light {
+    background: #f8f9fa;
+    border-color: #e9ecef;
+}
+
+.btn-light:hover {
+    background: #e9ecef;
+    border-color: #dee2e6;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .profile-header-content {
+        margin-top: -50px;
+        padding: 1rem;
+    }
+
+    .profile-avatar, .profile-avatar-placeholder {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-name {
+        font-size: 1.5rem;
+    }
+
+    .profile-card .card-header,
+    .profile-card .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Animações globais */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromTop {
+    from { opacity: 0; transform: translateY(-50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes rotateIcon {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}

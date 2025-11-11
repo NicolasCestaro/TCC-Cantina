@@ -1,0 +1,105 @@
+{% extends 'base/base.html' %}
+{% block title %}Meus Pedidos{% endblock title %}
+{% block maincontent %}
+
+<div class="container my-5">
+	<div class="text-center mb-4">
+		<h1 class="display-5 fw-bold">Meus Pedidos</h1>
+		<p class="text-muted">Acompanhe o status dos seus pedidos e veja detalhes de cada um.</p>
+	</div>
+
+	<style>
+		.order-card { border-radius:12px; overflow:hidden; transition:transform .14s ease, box-shadow .14s ease; }
+		.order-card:hover { transform:translateY(-6px); box-shadow:0 14px 36px rgba(2,6,23,0.06); }
+		.order-header { background: linear-gradient(90deg,var(--primary) 0%, #4f8cff 100%); color:#fff; }
+		.order-meta { font-size:0.95rem; }
+		.item-thumb { width:72px; height:72px; object-fit:cover; border-radius:8px; }
+		.status-pill { padding:6px 10px; border-radius:999px; font-weight:600; }
+		.status-Pending{ background: rgba(108,117,125,0.12); color: #6c757d; }
+		.status-Accepted{ background: rgba(13,110,253,0.12); color: #0d6efd; }
+		.status-Cooking{ background: rgba(13,110,253,0.12); color: #0d6efd; }
+		.status-Packed{ background: rgba(255,193,7,0.12); color:#ffc107; }
+		.status-Completed{ background: rgba(25,135,84,0.12); color:#198754; }
+		.status-Cancelled{ background: rgba(220,53,69,0.12); color:#dc3545; }
+	</style>
+
+	{% if orders %}
+		<div class="row g-4">
+			{% for entry in order_list %}
+				{% with order=entry.order items=entry.items %}
+				<div class="col-12">
+					<div class="card order-card">
+						<div class="card-body">
+							<div class="d-flex align-items-start justify-content-between">
+								<div>
+									<div class="d-flex align-items-center gap-3 mb-1">
+										<div class="fw-bold">Pedido #{{ order.id }}</div>
+										<div class="text-muted">• {{ order.order_datetime|date:"d M Y, H:i" }}</div>
+									</div>
+									<div class="order-meta text-muted">Total: <strong>R$ {{ order.total_amount }},00</strong> • {{ order.payment_mode }} • Tx: {{ order.transaction_id }}</div>
+								</div>
+
+								<div class="text-end">
+									<div class="mb-2">
+										<span class="status-pill status-{{ order.status|default:'Pending' }}">{{ order.status }}</span>
+									</div>
+									<div>
+										<button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="collapse" data-bs-target="#details{{order.id}}">Ver itens</button>
+										{% if order.status == 'Pending' or order.status == 'Accepted' %}
+											<a href="{% url 'cancel-order' order.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Deseja cancelar o pedido #{{order.id}}?');">Cancelar</a>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+
+							<div class="collapse mt-3" id="details{{order.id}}">
+								<div class="card card-body">
+									<div class="row g-3">
+										<div class="col-md-8">
+											<h6>Itens do pedido</h6>
+											<ul class="list-unstyled">
+												{% for it in items %}
+													<li class="d-flex align-items-center py-2 border-bottom">
+														{% if it.image_url %}
+															<img src="{{ it.image_url }}" alt="{{ it.name }}" class="item-thumb me-3">
+														{% else %}
+															<div class="bg-light d-inline-flex align-items-center justify-content-center me-3" style="width:72px;height:72px;border-radius:8px;"><i class="fa-solid fa-utensils text-muted"></i></div>
+														{% endif %}
+														<div class="flex-grow-1 text-start">
+															<div class="fw-semibold">{{ it.name }}</div>
+															<small class="text-muted">R$ {{ it.price }},00 • Quantidade: {{ it.quantity }}</small>
+														</div>
+														<div class="text-end fw-bold">R$ {{ it.item_total }},00</div>
+													</li>
+												{% endfor %}
+											</ul>
+										</div>
+										<div class="col-md-4">
+											<h6>Resumo</h6>
+											<div class="d-flex justify-content-between"><div>Subtotal</div><div>R$ {{ order.total_amount }},00</div></div>
+											<hr>
+											<div class="d-grid mt-3">
+												<a href="{% url 'menu' %}" class="btn btn-primary">Pedir mais</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				{% endwith %}
+			{% endfor %}
+		</div>
+	{% else %}
+		<div class="text-center mt-5">
+			<h3 class="mb-3">Você ainda não fez pedidos</h3>
+			<p class="text-muted">Explore nosso cardápio e faça seu primeiro pedido agora.</p>
+			<a href="{% url 'menu' %}" class="btn btn-lg btn-primary">Ver Cardápio</a>
+		</div>
+	{% endif %}
+
+</div>
+
+{% endblock maincontent %}

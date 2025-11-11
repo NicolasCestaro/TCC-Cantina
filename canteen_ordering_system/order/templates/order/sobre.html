@@ -1,0 +1,112 @@
+{% extends "base/base.html" %}
+{% block maincontent %}
+<style>
+  /* Estilos customizados para a página Sobre */
+  .hero-sobre{
+    background: linear-gradient(120deg, rgba(79,140,255,0.08), rgba(13,110,253,0.04));
+    border-radius: 14px;
+    padding: 48px 28px;
+    box-shadow: 0 8px 30px rgba(15,23,42,0.04);
+  }
+  .feature-card { border: none; border-radius:12px; transition:transform .18s ease, box-shadow .18s ease; }
+  .feature-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(13,110,253,0.08); }
+  .team-avatar { width:92px; height:92px; object-fit:cover; border-radius:50%; border:6px solid #fff; box-shadow:0 6px 20px rgba(13,110,253,0.08); }
+  .stat-box { background:linear-gradient(90deg, #ffffff, #f8fbff); border-radius:12px; padding:18px; text-align:center; }
+  .decor-dot { width:10px; height:10px; background:#0d6efd; border-radius:50%; display:inline-block; margin-right:8px; }
+  @media (max-width:576px){ .hero-sobre { padding:28px 16px; } .team-avatar{ width:72px; height:72px; } }
+</style>
+
+<div class="container my-5">
+  <div class="hero-sobre mb-4">
+    <div class="row align-items-center">
+      <div class="col-lg-12">
+        <h1 class="display-5 fw-bold">Sobre a nossa Cantina</h1>
+        <p class="lead text-muted">Comida caseira feita com carinho, rapidez e ingredientes frescos. Pensamos em soluções simples para você pedir, pagar e receber sem espera.</p>
+        <div class="mt-3">
+          <a href="{% url 'menu' %}" class="btn btn-primary btn-lg me-2">Ver Cardápio</a>
+          <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-lg">Voltar ao início</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="card feature-card p-3 h-100">
+        <div class="card-body">
+          <h5 class="card-title"><span class="decor-dot"></span> Missão</h5>
+          <p class="card-text text-muted">Oferecer refeições gostosas, nutritivas e acessíveis, com atendimento rápido e ambiente acolhedor.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card feature-card p-3 h-100">
+        <div class="card-body">
+          <h5 class="card-title"><span class="decor-dot"></span> Visão</h5>
+          <p class="card-text text-muted">Ser referência local em qualidade e praticidade, inovando sempre no cardápio e no serviço.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card feature-card p-3 h-100">
+        <div class="card-body">
+          <h5 class="card-title"><span class="decor-dot"></span> Valores</h5>
+          <p class="card-text text-muted">Simplicidade, respeito ao cliente, sustentabilidade e amor pela comida.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row align-items-center mb-4">
+    <div class="col-md-6">
+      <h3 class="h4">Nosso time</h3>
+      <p class="text-muted">Uma equipe pequena e dedicada que prepara tudo com atenção aos detalhes.</p>
+
+      <div class="d-flex gap-4 justify-content-start">
+        <div class="text-center">
+          <img src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Membro 1" class="team-avatar mb-2">
+          <div class="fw-semibold">Ana</div>
+          <small class="text-muted">Chefe de cozinha</small>
+        </div>
+
+        <div class="text-center">
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Membro 2" class="team-avatar mb-2">
+          <div class="fw-semibold">Carlos</div>
+          <small class="text-muted">Atendimento</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="row g-3">
+        <div class="col-4">
+          <div class="stat-box h-100">
+            <div class="fs-4 fw-bold">1.5k+</div>
+            <div class="text-muted">Pedidos servidos</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="stat-box h-100">
+            <div class="fs-4 fw-bold">120+</div>
+            <div class="text-muted">Pratos no cardápio</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="stat-box h-100">
+            <div class="fs-4 fw-bold">3.2k+</div>
+            <div class="text-muted">Clientes satisfeitos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12 text-center">
+      <p class="text-muted">Quer conhecer nossos pratos ou deixar um comentário? Fale com a gente ou experimente agora mesmo.</p>
+      <a href="{% url 'menu' %}" class="btn btn-primary btn-lg">Ver Cardápio</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% load static %}
+<h1 class="visually-hidden">Editar perfil</h1>
+
+<div class="container my-4">
+  <div class="card p-3">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <!-- preview -->
+      {% if profile.image %}
+        <img src="{{ profile.image.url }}" style="width:120px;height:120px;object-fit:cover;border-radius:50%;">
+      {% else %}
+        <img src="/static/img/avatar-placeholder.png" style="width:120px;height:120px;border-radius:50%;">
+      {% endif %}
+
+      <!-- input -->
+      <div>
+        <label>Alterar imagem</label>
+        {{ form.image }}
+      </div>
+
+      <button type="submit">Salvar</button>
+      <a class="btn btn-link" href="{% url 'profile' %}">Cancelar</a>
+    </form>
+  </div>
+</div>
