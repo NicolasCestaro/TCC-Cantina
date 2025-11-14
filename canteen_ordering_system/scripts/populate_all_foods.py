@@ -1,10 +1,17 @@
 import os
 import django
+import sys
+from pathlib import Path
+
+# Ensure project root is in sys.path so Django settings package can be imported
+proj_root = Path(__file__).resolve().parents[1]
+if str(proj_root) not in sys.path:
+    sys.path.insert(0, str(proj_root))
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'canteen_ordering_sys.settings')
 django.setup()
 
-from order.models import FoodItem
+from canteen.models import FoodItem
 
 # Dados dos produtos organizados por categoria
 products = {

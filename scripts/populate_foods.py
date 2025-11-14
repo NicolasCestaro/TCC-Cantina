@@ -1,8 +1,8 @@
 from decimal import Decimal
 try:
-    from order.models import Food
+    from canteen.models import FoodItem as Food
 except Exception as e:
-    print("Erro ao importar Food:", e)
+    print("Erro ao importar FoodItem:", e)
     raise SystemExit
 
 products = [
