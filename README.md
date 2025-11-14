@@ -167,42 +167,181 @@ Itens individuais dentro de um pedido.
 - pip (gerenciador de pacotes Python)
 - Git
 
-### 1. Clonar Repositório
-```bash
+---
+
+## 📋 SETUP RÁPIDO - COMANDOS COMPLETOS (Windows PowerShell)
+
+**Copie e execute TODOS esses comandos para configurar o projeto sem erros:**
+
+### 1️⃣ Clone e entre na pasta do projeto
+```powershell
 git clone https://github.com/NicolasCestaro/TCC-Cantina.git
-cd TCC-Cantina/canteen_ordering_system
+cd TCC-Cantina\canteen_ordering_system
 ```
 
-### 2. Criar Ambiente Virtual
-```bash
-# Windows
+### 2️⃣ Remova banco antigo (se existir) e crie novo ambiente virtual
+```powershell
+if (Test-Path .\db.sqlite3) { Remove-Item -Force .\db.sqlite3 }
 python -m venv venv
-venv\Scripts\activate
-
-# Mac/Linux
-python3 -m venv venv
-source venv/bin/activate
 ```
 
-### 3. Instalar Dependências
-```bash
+### 3️⃣ Instale as dependências (Django 4.2 e Pillow)
+```powershell
 pip install -r requirements.txt
 ```
 
-### 4. Executar Migrações
-```bash
+### 4️⃣ Execute as migrations para criar as tabelas no banco
+```powershell
+python manage.py showmigrations
 python manage.py migrate
+python manage.py showmigrations
 ```
 
-### 5. Carregar Dados Iniciais (Produtos)
-```bash
-python scripts/populate_all_foods.py
+**Saída esperada:** Todas as migrations devem ter um `[X]` marcando que foram aplicadas.
+
+### 5️⃣ Popule o banco com 125 produtos
+```powershell
+python -c "
+import os, sys, django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'canteen_ordering_sys.settings')
+django.setup()
+from decimal import Decimal
+from canteen.models import FoodItem as Food
+products = [
+  ('Refrigerante lata (350ml)', '5.00', 'Bebidas'),
+  ('Refrigerante 600ml', '7.00', 'Bebidas'),
+  ('Guaraná lata (350ml)', '5.00', 'Bebidas'),
+  ('Suco natural 300ml', '6.00', 'Bebidas'),
+  ('Suco de caixinha', '3.00', 'Bebidas'),
+  ('Água 500ml', '2.50', 'Bebidas'),
+  ('Água 1.5L', '4.00', 'Bebidas'),
+  ('Chá gelado', '4.50', 'Bebidas'),
+  ('Achocolatado', '5.00', 'Bebidas'),
+  ('Soda italiana', '6.00', 'Bebidas'),
+  ('Limonada natural', '5.50', 'Bebidas'),
+  ('Suco de laranja natural', '6.50', 'Bebidas'),
+  ('Energético lata', '8.00', 'Bebidas'),
+  ('Cerveja (350ml)', '6.00', 'Bebidas'),
+  ('Vinho tinto (copo)', '12.00', 'Bebidas'),
+  ('Café com leite', '4.00', 'Bebidas Extras'),
+  ('Cappuccino', '7.00', 'Bebidas Extras'),
+  ('Café expresso', '3.50', 'Bebidas Extras'),
+  ('Café americano', '3.00', 'Bebidas Extras'),
+  ('Chocolate quente', '5.50', 'Bebidas Extras'),
+  ('Leite quente', '3.50', 'Bebidas Extras'),
+  ('Chá quente variado', '3.00', 'Bebidas Extras'),
+  ('Milkshake morango', '8.00', 'Bebidas Extras'),
+  ('Milkshake chocolate', '8.00', 'Bebidas Extras'),
+  ('Milkshake baunilha', '8.00', 'Bebidas Extras'),
+  ('Coxinha', '5.00', 'Salgados'),
+  ('Pastel de queijo', '6.00', 'Salgados'),
+  ('Kibe frito', '5.50', 'Salgados'),
+  ('Enroladinho de salsicha', '4.50', 'Salgados'),
+  ('Pão de queijo (unidade)', '3.50', 'Salgados'),
+  ('Empada', '5.00', 'Salgados'),
+  ('Bola de carne', '4.50', 'Salgados'),
+  ('Croissant de presunto', '6.50', 'Salgados'),
+  ('Risole de carne', '5.00', 'Salgados'),
+  ('Esfirra de carne', '5.50', 'Salgados'),
+  ('Torta de frango', '7.00', 'Salgados'),
+  ('Quiche de verdura', '7.50', 'Salgados'),
+  ('Sequilho', '3.50', 'Salgados'),
+  ('Biscoito de polvilho', '4.00', 'Salgados'),
+  ('Bolacha salgada (pacote)', '3.00', 'Salgados'),
+  ('Broa de chuchu', '5.00', 'Salgados'),
+  ('Bolo de milho', '4.50', 'Salgados'),
+  ('Acarajé', '6.00', 'Salgados'),
+  ('Pastel de carne', '6.00', 'Salgados'),
+  ('Pastéis doces variados', '5.50', 'Salgados'),
+  ('Hambúrguer simples', '8.00', 'Salgados Extras'),
+  ('Hambúrguer duplo', '12.00', 'Salgados Extras'),
+  ('Misto quente', '7.00', 'Salgados Extras'),
+  ('Sanduíche natural', '9.50', 'Salgados Extras'),
+  ('Sanduíche de atum', '10.00', 'Salgados Extras'),
+  ('Torta presunto e queijo', '8.00', 'Salgados Extras'),
+  ('Cachorro quente', '6.00', 'Salgados Extras'),
+  ('Cachorro quente completo', '8.00', 'Salgados Extras'),
+  ('X-Burguer', '9.00', 'Salgados Extras'),
+  ('X-Egg', '10.00', 'Salgados Extras'),
+  ('X-Bacon', '11.00', 'Salgados Extras'),
+  ('Frango empanado', '9.00', 'Salgados Extras'),
+  ('Peixe empanado', '10.00', 'Salgados Extras'),
+  ('Tira de frango', '8.50', 'Salgados Extras'),
+  ('Batata frita grande', '12.00', 'Salgados Extras'),
+  ('Batata frita pequena', '6.00', 'Lanches Rápidos'),
+  ('Batata frita média', '9.00', 'Lanches Rápidos'),
+  ('Batata frita com queijo', '10.00', 'Lanches Rápidos'),
+  ('Batata frita com bacon', '11.00', 'Lanches Rápidos'),
+  ('Aros de cebola', '7.00', 'Lanches Rápidos'),
+  ('Nuggets (6 peças)', '8.00', 'Lanches Rápidos'),
+  ('Asas de frango (4 peças)', '9.00', 'Lanches Rápidos'),
+  ('Bolinhas de queijo', '7.50', 'Lanches Rápidos'),
+  ('Pastel frito (unidade)', '5.50', 'Lanches Rápidos'),
+  ('Pão na chapa', '4.00', 'Lanches Rápidos'),
+  ('Tapioca simples', '5.00', 'Lanches Rápidos'),
+  ('Tapioca com queijo', '6.50', 'Lanches Rápidos'),
+  ('Brigadeiro', '2.50', 'Doces'),
+  ('Beijinho', '2.50', 'Doces'),
+  ('Romeu e Julieta', '3.00', 'Doces'),
+  ('Bolo (fatia)', '5.00', 'Doces'),
+  ('Bolo de chocolate (fatia)', '5.50', 'Doces'),
+  ('Bolo de cenoura (fatia)', '5.00', 'Doces'),
+  ('Pudim (unidade)', '4.00', 'Doces'),
+  ('Mousse de chocolate', '6.00', 'Doces'),
+  ('Pavê', '5.50', 'Doces'),
+  ('Torta de frutas vermelhas', '7.00', 'Doces'),
+  ('Sonho (unidade)', '4.50', 'Doces'),
+  ('Churro', '3.50', 'Doces'),
+  ('Churro com chocolate', '5.00', 'Doces'),
+  ('Donut', '4.00', 'Doces'),
+  ('Donut com cobertura', '5.00', 'Doces'),
+  ('Brownie', '5.00', 'Doces'),
+  ('Bolo de chocolate gelado', '6.00', 'Doces'),
+  ('Sorvete (bola)', '4.00', 'Doces'),
+  ('Chips (pacote)', '4.00', 'Snacks Embalados'),
+  ('Salgadinho (pacote)', '3.50', 'Snacks Embalados'),
+  ('Pirulito', '1.50', 'Snacks Embalados'),
+  ('Chiclete', '1.00', 'Snacks Embalados'),
+  ('Bala', '0.50', 'Snacks Embalados'),
+  ('Chocolate', '3.00', 'Snacks Embalados'),
+  ('Chocolate branco', '3.00', 'Snacks Embalados'),
+  ('Biscoito doce (pacote)', '3.50', 'Snacks Embalados'),
+  ('Biscoito recheado (pacote)', '4.00', 'Snacks Embalados'),
+  ('Rosca doce', '3.00', 'Snacks Embalados'),
+  ('Amendoim (pacote)', '4.50', 'Snacks Embalados'),
+  ('Castanha (pacote)', '6.00', 'Snacks Embalados'),
+  ('Mix de castanhas', '7.00', 'Snacks Embalados'),
+  ('Pipoca (pacote)', '3.00', 'Snacks Embalados'),
+  ('Granola (pacote)', '5.00', 'Snacks Embalados'),
+  ('Iogurte 170g', '3.50', 'Bebidas'),
+  ('Iogurte grego 150g', '5.00', 'Bebidas'),
+  ('Iogurte com granola', '6.00', 'Bebidas'),
+  ('Fruta da estação (pote)', '7.00', 'Produtos Saudáveis'),
+  ('Salada verde (pote)', '8.00', 'Produtos Saudáveis'),
+  ('Salada caesar (pote)', '9.00', 'Produtos Saudáveis'),
+  ('Açai 300ml', '10.00', 'Produtos Saudáveis'),
+  ('Smoothie morango', '8.50', 'Bebidas Extras'),
+  ('Smoothie banana', '8.50', 'Bebidas Extras'),
+  ('Smoothie detox', '9.00', 'Bebidas Extras'),
+  ('Mel (pote pequeno)', '5.00', 'Ingredientes Básicos'),
+  ('Geleia (pote pequeno)', '4.00', 'Ingredientes Básicos'),
+  ('Manteiga (pote)', '6.00', 'Ingredientes Básicos'),
+  ('Cream cheese (pote)', '7.00', 'Ingredientes Básicos'),
+  ('Queijo ralado (pote)', '5.50', 'Ingredientes Básicos'),
+  ('Azeite (frasco)', '8.00', 'Ingredientes Básicos'),
+  ('Molho de tomate (frasco)', '4.50', 'Ingredientes Básicos'),
+  ('Maionese (pote)', '5.00', 'Ingredientes Básicos'),
+  ('Catchup (frasco)', '4.00', 'Ingredientes Básicos'),
+]
+for name, price, category in products:
+    defaults = {'price': int(float(price) * 100), 'category': category}
+    Food.objects.get_or_create(name=name, defaults=defaults)
+print(f'✅ {Food.objects.count()} produtos carregados')
+"
 ```
 
-Isso carrega ~83 produtos em 15 categorias.
-
-### 6. (Opcional) Criar Superusuário
-```bash
+### 6️⃣ (Opcional) Criar Superusuário para acessar admin
+```powershell
 python manage.py createsuperuser
 ```
 
@@ -211,12 +350,17 @@ Você será solicitado a inserir:
 - Email
 - Senha
 
-### 7. Iniciar Servidor de Desenvolvimento
-```bash
+### 7️⃣ Iniciar Servidor de Desenvolvimento
+```powershell
 python manage.py runserver
 ```
 
 Abra seu navegador em: **http://127.0.0.1:8000**
+
+**Sucesso! ✅ Acesse:**
+- **Home:** http://127.0.0.1:8000/
+- **Cardápio:** http://127.0.0.1:8000/menu/
+- **Admin:** http://127.0.0.1:8000/admin/
 
 ---
 
@@ -397,6 +541,30 @@ Este é um **Trabalho de Conclusão de Curso (TCC)** que visa desenvolver um sis
 - ✅ Boas práticas de desenvolvimento web
 
 ---
+
+**Important (when cloning this repository)**
+
+- If you cloned this repository and see "no such table: canteen_fooditem" or similar database errors, it means your local SQLite file is not in sync with migrations. To fix this on the machine you cloned to, run:
+
+```powershell
+# from the project folder containing manage.py
+python -m venv venv; .\venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python scripts/populate_foods.py
+python manage.py runserver
+```
+
+- If the repository contains a committed `db.sqlite3` (from another machine), it can cause schema mismatches. Remove the tracked DB (once) so others won't get the wrong DB:
+
+```powershell
+git rm --cached canteen_ordering_system\db.sqlite3
+git commit -m "Remove committed SQLite DB; use migrations instead"
+git push
+```
+
+This repository now includes a `.gitignore` that excludes `db.sqlite3` and `media/` so the local DB and uploads won't be committed again.
+
 
 **Última atualização:** Novembro 2025
 
